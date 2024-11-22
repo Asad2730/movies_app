@@ -1,3 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+@layer base {
+  html {
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .dark {
+    background-color: #1a202c;
+    color: #f7fafc;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .dark\:bg-gray-900 {
+    background-color: #1a202c;
+  }
+
+  .dark\:text-white {
+    color: #f7fafc;
+  }
+}
