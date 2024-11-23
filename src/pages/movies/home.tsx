@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useInView } from "react-intersection-observer";
 import { useNavigate } from "react-router-dom";
-import { IResult, IData } from "./interface/data";
 import { useDispatch } from "react-redux";
+import { IResult, IData } from "./interface/data";
 import { setSelectedMovie } from "../../store/movieSlice";
 
 const Home = () => {
@@ -15,11 +15,12 @@ const Home = () => {
   const [hasMore, setHasMore] = useState(true);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const fetchData = useCallback(async () => {
-    if (loading) return;
-    setLoading(true);
+    if (loading || !hasMore) return;
 
+    setLoading(true);
     try {
       const response = await axios.get<IData>("https://itunes.apple.com/search", {
         params: {
@@ -30,49 +31,34 @@ const Home = () => {
           offset: (page - 1) * 10,
         },
       });
+
       const results = response.data.results;
 
-      if (results.length > 0) {
-        setData((prevData) => [...prevData, ...results]);
-      } else {
+      if (results.length === 0) {
         setHasMore(false);
+      } else {
+        setData((prevData) => [...prevData, ...results]);
       }
     } catch (error) {
-      console.error("Error fetching data", error);
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
-  }, [page, loading]);
+  }, [page, loading, hasMore]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  useEffect(() => {
-    if (sortBy === "price") {
-      setData((prevData) => [...prevData].sort((a, b) => a.trackPrice - b.trackPrice));
-    } else if (sortBy === "releaseDate") {
-      setData((prevData) => [...prevData].sort((a, b) => new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime()));
-    }
-  }, [sortBy]);
-
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortBy(e.target.value);
-    setData([]);
-    setPage(1);
-    setHasMore(true);
+    const sortedData = [...data].sort((a, b) =>
+      e.target.value === "price"
+        ? a.trackPrice - b.trackPrice
+        : new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime()
+    );
+    setData(sortedData);
   };
-
-  const { ref } = useInView({
-    triggerOnce: false,
-    onChange: (inView) => {
-      if (inView && hasMore && !loading) {
-        setPage((prevPage) => prevPage + 1);
-      }
-    },
-  });
-   
-  const dispatch = useDispatch()
 
   const handleNavigate = (item: IResult) => {
     dispatch(setSelectedMovie(item));
@@ -80,34 +66,38 @@ const Home = () => {
     window.location.reload();
   };
 
+  const { ref } = useInView({
+    onChange: (inView) => {
+      if (inView && hasMore && !loading) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    },
+  });
+
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between mb-4">
-        <div>
-          <button
-            onClick={() => setView(view === "grid" ? "list" : "grid")}
-            className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-md transition duration-200 transform hover:scale-105"
-          >
-            {view === "grid" ? "Switch to List View" : "Switch to Grid View"}
-          </button>
-        </div>
-        <div>
-          <select
-            onChange={handleSortChange}
-            value={sortBy}
-            className="border p-2 rounded-md bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 transition duration-200"
-          >
-            <option value="price">Sort by Price</option>
-            <option value="releaseDate">Sort by Release Date</option>
-          </select>
-        </div>
+        <button
+          onClick={() => setView(view === "grid" ? "list" : "grid")}
+          className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-md transition duration-200"
+        >
+          {view === "grid" ? "Switch to List View" : "Switch to Grid View"}
+        </button>
+        <select
+          onChange={handleSortChange}
+          value={sortBy}
+          className="border p-2 rounded-md bg-gray-100 text-gray-700"
+        >
+          <option value="price">Sort by Price</option>
+          <option value="releaseDate">Sort by Release Date</option>
+        </select>
       </div>
 
       <div className={`grid ${view === "grid" ? "grid-cols-2 md:grid-cols-4" : "grid-cols-1"} gap-4`}>
         {data.map((item) => (
           <div
             key={item.trackId}
-            className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl dark:bg-gray-800 dark:text-white transition-all duration-300"
+            className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300"
             onClick={() => handleNavigate(item)}
           >
             <img
@@ -116,8 +106,8 @@ const Home = () => {
               className="w-full h-48 object-cover rounded-md mb-4"
             />
             <h3 className="text-lg font-semibold mb-2">{item.trackName}</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{item.primaryGenreName}</p>
-            <p className="text-md text-gray-800 mt-2 dark:text-gray-200">{`$${item.trackPrice}`}</p>
+            <p className="text-sm text-gray-600">{item.primaryGenreName}</p>
+            <p className="text-md text-gray-800 mt-2">{`$${item.trackPrice}`}</p>
           </div>
         ))}
       </div>
@@ -127,7 +117,6 @@ const Home = () => {
           <p>Loading...</p>
         </div>
       )}
-
       <div ref={ref}></div>
     </div>
   );
