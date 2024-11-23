@@ -1,0 +1,1 @@
+export const ip:string = 'http://localhost:8000/api'

@@ -3,13 +3,14 @@ import { CustomInput } from "./components/customInput";
 import { CustomBtn } from "./components/customBtn";
 import { useNavigate } from "react-router-dom";
 import { CustomLink } from "./components/customLink";
+import axios from "axios";
+import { ip } from "../../util/helper";
 
 const SignUp = () => {
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
-    password_confirmation: "",
   });
 
   const navigate = useNavigate();
@@ -21,10 +22,22 @@ const SignUp = () => {
     []
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-  };
-
+  const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+     
+      try {
+        const res = await axios.post(`${ip}/auth/signup`, form);
+        if (res?.status === 200 || res?.status === 201 ) {
+          console.log("Register successful:", res.data);
+           navigate('/')
+        } else {
+          console.log("Register failed:", res.data );
+        }
+      } catch (ex) {
+        console.error("Error during login:", ex);
+      }
+    }
+    
   return (
     <div className="min-h-screen bg-gradient-to-r from-purple-500 to-indigo-500 flex justify-center items-center">
       <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-xl">
@@ -53,13 +66,7 @@ const SignUp = () => {
             onChange={(e) => handleForm("password", e)}
             value={form.password}
           />
-          <CustomInput
-            label="Confirm Password"
-            type={"password"}
-            placeHolder="Confirm your password"
-            onChange={(e) => handleForm("password_confirmation", e)}
-            value={form.password_confirmation}
-          />
+         
           <div className="flex items-center justify-between">
             <CustomBtn title="Sign Up" />
           </div>

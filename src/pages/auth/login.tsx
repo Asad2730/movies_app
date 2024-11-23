@@ -3,13 +3,18 @@ import { CustomInput } from "./components/customInput";
 import { CustomBtn } from "./components/customBtn";
 import { useNavigate } from "react-router-dom";
 import { CustomLink } from "./components/customLink";
+import axios from "axios";
+import { ip } from "../../util/helper";
+import { useDispatch } from "react-redux";
+import { setAuthToken } from "../../store/authSlice";
 
 const Login = () => {
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
-
+  
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleForm = useCallback(
@@ -18,13 +23,25 @@ const Login = () => {
     []
   );
 
-  const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      
-    },
-    []
-  );
+     
+      try {
+        const res = await axios.post(`${ip}/auth/login`, form);
+        if (res?.status === 200 ) {
+          console.log("Login successful:", res.data);
+          const token = res?.data?.token;
+          if (token) {
+            dispatch(setAuthToken(token));
+            navigate('/home')
+          }
+        } else {
+          console.log("Login failed:", res?.data);
+        }
+      } catch (ex) {
+        console.error("Error during login:", ex);
+      }
+    }
 
   const formMemo = useMemo(() => form, [form]);
 

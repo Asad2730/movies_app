@@ -3,6 +3,8 @@ import axios from "axios";
 import { useInView } from "react-intersection-observer";
 import { useNavigate } from "react-router-dom";
 import { IResult, IData } from "./interface/data";
+import { useDispatch } from "react-redux";
+import { setSelectedMovie } from "../../store/movieSlice";
 
 const Home = () => {
   const [data, setData] = useState<IResult[]>([]);
@@ -69,10 +71,13 @@ const Home = () => {
       }
     },
   });
+   
+  const dispatch = useDispatch()
 
   const handleNavigate = (item: IResult) => {
-    navigate("/detail", { state: { movie: item } });
-    window.location.reload()
+    dispatch(setSelectedMovie(item));
+    navigate("/detail");
+    window.location.reload();
   };
 
   return (

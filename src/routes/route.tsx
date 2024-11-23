@@ -1,4 +1,4 @@
-import React from "react";
+import React  from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "../pages/auth/login";
 import SignUp from "../pages/auth/signup";
@@ -21,28 +21,31 @@ const DarkModeToggle: React.FC = () => {
 };
 
 const AppRoutes: React.FC = () => {
+ 
+
+  return (
+    <div className="container mx-auto p-4">
+      <DarkModeToggle />
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route element={<PrivateRoute />}>
+          <Route path="/home" element={<Home />} />
+          <Route path="/detail" element={<Detail />} />
+        </Route>
+      </Routes>
+    </div>
+  );
+};
+
+const App: React.FC = () => {
   return (
     <DarkModeProvider>
       <BrowserRouter>
-        <div className="container mx-auto p-4">
-          <DarkModeToggle />
-          <Routes>
-            <Route path="/" element={<Login />}  />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/detail" element={<Detail />} />
-
-
-            {/* <Route element={<PrivateRoute/>}>
-            <Route path="/home" element={<Home />} />
-            <Route path="/detail" element={<Detail />} />
-            </Route> */}
-
-          </Routes>
-        </div>
+        <AppRoutes />
       </BrowserRouter>
     </DarkModeProvider>
   );
 };
 
-export default AppRoutes;
+export default App;
