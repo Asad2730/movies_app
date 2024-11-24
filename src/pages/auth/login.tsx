@@ -37,9 +37,11 @@ const Login = () => {
           }
         } else {
           console.log("Login failed:", res?.data);
+          window.alert(`Login Failed ${res.data}`);
         }
       } catch (ex) {
         console.error("Error during login:", ex);
+        window.alert(`Error during login ${ex}`);
       }
     }
 

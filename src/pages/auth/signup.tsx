@@ -28,13 +28,15 @@ const SignUp = () => {
       try {
         const res = await axios.post(`${ip}/auth/signup`, form);
         if (res?.status === 200 || res?.status === 201 ) {
-          console.log("Register successful:", res.data);
+          window.alert(`Register successful:`);
            navigate('/')
         } else {
           console.log("Register failed:", res.data );
+          window.alert(`Error occured ${res.data}`);
         }
       } catch (ex) {
         console.error("Error during login:", ex);
+        window.alert(`Error during signup ${ex}`);
       }
     }
     

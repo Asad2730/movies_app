@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { IResult, IData } from "./interface/data";
 import { setSelectedMovie } from "../../store/movieSlice";
+import { ip } from "../../util/helper";
 
 const Home = () => {
   const [data, setData] = useState<IResult[]>([]);
@@ -74,6 +75,20 @@ const Home = () => {
     },
   });
 
+  const addToFavorite = async (item: IResult) => {
+    try {
+      const res = await axios.post(`${ip}/favorites/`, item);
+      if (res.status === 200 || res.status === 201) {
+        window.alert("Added to Favorites!");
+      } else {
+        window.alert("Error adding to Favorites!");
+      }
+    } catch (ex) {
+      console.error("Error adding to favorites:", ex);
+      window.alert("An error occurred. Please try again.");
+    }
+  };
+
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between mb-4">
@@ -93,21 +108,31 @@ const Home = () => {
         </select>
       </div>
 
-      <div className={`grid ${view === "grid" ? "grid-cols-2 md:grid-cols-4" : "grid-cols-1"} gap-4`}>
+      <div
+        className={`grid ${
+          view === "grid" ? "grid-cols-2 md:grid-cols-4" : "grid-cols-1"
+        } gap-4`}
+      >
         {data.map((item) => (
           <div
             key={item.trackId}
             className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300"
-            onClick={() => handleNavigate(item)}
           >
             <img
               src={item.artworkUrl100}
               alt={item.trackName}
               className="w-full h-48 object-cover rounded-md mb-4"
+              onClick={() => handleNavigate(item)}
             />
             <h3 className="text-lg font-semibold mb-2">{item.trackName}</h3>
             <p className="text-sm text-gray-600">{item.primaryGenreName}</p>
             <p className="text-md text-gray-800 mt-2">{`$${item.trackPrice}`}</p>
+            <button
+              onClick={() => addToFavorite(item)}
+              className="bg-green-500 hover:bg-green-600 text-white mt-2 p-2 rounded-md transition duration-200"
+            >
+              Add to Favorites
+            </button>
           </div>
         ))}
       </div>
