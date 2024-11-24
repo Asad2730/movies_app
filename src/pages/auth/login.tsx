@@ -1,19 +1,17 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 import { CustomInput } from "./components/customInput";
-import { CustomBtn } from "./components/customBtn";
 import { useNavigate } from "react-router-dom";
-import { CustomLink } from "./components/customLink";
-import axios from "axios";
-import { ip } from "../../util/helper";
 import { useDispatch } from "react-redux";
 import { setAuthToken } from "../../store/authSlice";
+import { loginUser } from "./api/request";
+import { AuthForm } from "./components/authForm";
 
 const Login = () => {
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
-  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -24,62 +22,47 @@ const Login = () => {
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-     
-      try {
-        console.log('called',form)
-        const res = await axios.post(`${ip}/auth/login`, form);
-        if (res?.status === 200 ) {
-          const token = res?.data;
-          if (token) {
-           
-            dispatch(setAuthToken(token));
-            navigate('/home')
-          }
-        } else {
-          console.log("Login failed:", res?.data);
-          window.alert(`Login Failed ${res.data}`);
-        }
-      } catch (ex) {
-        console.error("Error during login:", ex);
-        window.alert(`Error during login ${ex}`);
-      }
+    e.preventDefault();
+    try {
+      const token = await loginUser(form);
+      dispatch(setAuthToken(token));
+      navigate("/");
+    } catch (error) {
+      window.alert(`Error during login: ${error}`);
     }
+  };
 
-  const formMemo = useMemo(() => form, [form]);
+
+
+  const inputs = [
+    <CustomInput
+      key={1}
+      label="Email"
+      type="email"
+      placeHolder="Enter your email"
+      onChange={(e) => handleForm("email", e)}
+      value={form.email}
+    />,
+    <CustomInput
+      key={2}
+      label="Password"
+      type="password"
+      placeHolder="Enter your password"
+      onChange={(e) => handleForm("password", e)}
+      value={form.password}
+    />,
+  ];
 
   return (
-    <div className="min-h-screen flex justify-center items-center">
-      <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-xl">
-        <h2 className="text-3xl font-semibold text-center text-gray-700 mb-6">
-          Welcome Back
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <CustomInput
-            label="Email"
-            type="email"
-            placeHolder="Enter your email"
-            onChange={(e) => handleForm("email", e)}
-            value={formMemo.email}
-          />
-          <CustomInput
-            label="Password"
-            type="password"
-            placeHolder="Enter your password"
-            onChange={(e) => handleForm("password", e)}
-            value={formMemo.password}
-          />
-          <CustomBtn title="Log In"  />
-          <div className="text-center mt-4">
-            <CustomLink
-              title="Don't have an account?"
-              subtitle="Sign Up"
-              nav={() => navigate("/signup")}
-            />
-          </div>
-        </form>
-      </div>
-    </div>
+    <AuthForm
+      title="Welcome back"
+      inputs={inputs}
+      btnTitle="Log in"
+      handleSubmit={handleSubmit}
+      linkTitle="Don't have an account?"
+      linkSubTitle="sign up"
+      nav={() => navigate("/signup")}
+    />
   );
 };
 

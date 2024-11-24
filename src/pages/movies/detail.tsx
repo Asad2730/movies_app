@@ -12,7 +12,7 @@ const Detail = () => {
     <div className="container mx-auto p-4">
       <div className="flex flex-col md:flex-row">
         <img
-          src={movie.artworkUrl100}
+          src={movie.artworkUrl100.replace("100x100", "600x600")}
           alt={movie.trackName}
           className="w-full md:w-1/3 rounded-md mb-4 md:mb-0"
         />

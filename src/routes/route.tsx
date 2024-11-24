@@ -7,6 +7,7 @@ import Detail from "../pages/movies/detail";
 import PrivateRoute from "./privateRoute";
 import { DarkModeProvider,  } from "../context/DarkModeContext";
 import { DarkModeToggle } from "../util/darkMode";
+import Favorites from "../pages/movies/favorites";
 
 
 const AppRoutes: React.FC = () => {
@@ -16,12 +17,13 @@ const AppRoutes: React.FC = () => {
     <div className="container mx-auto p-4">
       <DarkModeToggle />
       <Routes>
-        <Route path="/" element={<Login />} />
+      <Route path="/" element={<Home />}  />
+        <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route element={<PrivateRoute />}>
-          <Route path="/home" element={<Home />} />
-          <Route path="/detail" element={<Detail />} />
+          <Route path="/favorites" element={<Favorites/>}/>
         </Route>
+        <Route path="/detail" element={<Detail />} />
       </Routes>
     </div>
   );

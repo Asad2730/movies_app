@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useInView } from "react-intersection-observer";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { IResult } from "./interface/data";
 import { setSelectedMovie } from "../../store/movieSlice";
 import { MoviesList } from "./components/moviesList";
-import { addToFavorite, fetchMovies } from "./api/request";
+import {  GetFavorite } from "./api/request";
 import { HeaderNavigation } from "./components/headerNavigation";
 
-const Home = () => {
+const Favorites = () => {
+  const token = useSelector((state: any) => state.auth.token);
   const [data, setData] = useState<IResult[]>([]);
   const [page, setPage] = useState(1);
   const [view, setView] = useState("grid");
@@ -26,19 +27,20 @@ const Home = () => {
     setLoading(true);
     setError(null);
     try {
-      const results = await fetchMovies(page);
+      const results = await GetFavorite(token, page);
 
       if (results.length === 0) {
         setHasMore(false);
       } else {
         setData((prevData) => [...prevData, ...results]);
+        setPage((prevPage) => prevPage + 1);
       }
     } catch (err) {
       setError("Failed to load movies. Please try again later.");
     } finally {
       setLoading(false);
     }
-  }, [page, loading, hasMore]);
+  }, [page, loading, hasMore, token]);
 
   useEffect(() => {
     loadMovies();
@@ -60,7 +62,6 @@ const Home = () => {
   const handleNavigate = (item: IResult) => {
     dispatch(setSelectedMovie(item));
     navigate("/detail");
-    window.location.reload();
   };
 
   const { ref } = useInView({
@@ -73,7 +74,7 @@ const Home = () => {
 
   return (
     <div className="container mx-auto p-4">
-       <HeaderNavigation/>
+      <HeaderNavigation />
       <div className="flex flex-wrap justify-between items-center mb-4 gap-4 mt-4">
         <button
           onClick={() => setView(view === "grid" ? "list" : "grid")}
@@ -101,7 +102,7 @@ const Home = () => {
       <MoviesList
         data={data}
         handleNavigate={handleNavigate}
-        addToFavorite={addToFavorite}
+       
         view={view}
       />
 
@@ -116,4 +117,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Favorites;
