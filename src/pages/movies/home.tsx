@@ -85,9 +85,7 @@ const Home = () => {
       const config = {
         headers: { Authorization: `Bearer ${token}` }
     };
-       
       const res = await axios.post(`${ip}/favorites/`,item,config);
-      console.log('response is',res)
       if (res.status === 201) {
         window.alert("Added to Favorites!");
       } else {
