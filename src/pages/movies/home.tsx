@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useInView } from "react-intersection-observer";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { IResult, IData } from "./interface/data";
 import { setSelectedMovie } from "../../store/movieSlice";
 import { ip } from "../../util/helper";
@@ -23,15 +23,18 @@ const Home = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get<IData>("https://itunes.apple.com/search", {
-        params: {
-          term: "star",
-          country: "au",
-          media: "movie",
-          limit: 10,
-          offset: (page - 1) * 10,
-        },
-      });
+      const response = await axios.get<IData>(
+        "https://itunes.apple.com/search",
+        {
+          params: {
+            term: "star",
+            country: "au",
+            media: "movie",
+            limit: 10,
+            offset: (page - 1) * 10,
+          },
+        }
+      );
 
       const results = response.data.results;
 
@@ -75,11 +78,20 @@ const Home = () => {
     },
   });
 
+  const token = useSelector((state:any)=>state.auth.token)
   const addToFavorite = async (item: IResult) => {
     try {
-      console.log('item->',item)
-      const res = await axios.post(`${ip}/favorites/`, item);
-      console.log(res,'res is this')
+      console.log('token',token)
+      const res = await axios.post(
+        `${ip}/favorites/`, 
+        item, 
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      
       if (res.status === 200 || res.status === 201) {
         window.alert("Added to Favorites!");
       } else {
@@ -90,6 +102,7 @@ const Home = () => {
       window.alert("An error occurred. Please try again.");
     }
   };
+
 
   return (
     <div className="container mx-auto p-4">
@@ -123,9 +136,10 @@ const Home = () => {
             <img
               src={item.artworkUrl100}
               alt={item.trackName}
-              className="w-full h-48 object-cover rounded-md mb-4"
+              className="w-full h-48 object-cover rounded-md mb-4 cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-200"
               onClick={() => handleNavigate(item)}
             />
+
             <h3 className="text-lg font-semibold mb-2">{item.trackName}</h3>
             <p className="text-sm text-gray-600">{item.primaryGenreName}</p>
             <p className="text-md text-gray-800 mt-2">{`$${item.trackPrice}`}</p>
