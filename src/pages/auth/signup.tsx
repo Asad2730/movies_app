@@ -27,7 +27,7 @@ const SignUp = () => {
      
       try {
         const res = await axios.post(`${ip}/auth/signup`, form);
-        if (res?.status === 200 || res?.status === 201 ) {
+        if ( res?.status === 201 ) {
           window.alert(`Register successful:`);
            navigate('/')
         } else {

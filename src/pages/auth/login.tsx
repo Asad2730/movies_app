@@ -27,11 +27,12 @@ const Login = () => {
       e.preventDefault();
      
       try {
+        console.log('called',form)
         const res = await axios.post(`${ip}/auth/login`, form);
         if (res?.status === 200 ) {
-          console.log("Login successful:", res.data);
-          const token = res?.data?.token;
+          const token = res?.data;
           if (token) {
+           
             dispatch(setAuthToken(token));
             navigate('/home')
           }
@@ -68,7 +69,7 @@ const Login = () => {
             onChange={(e) => handleForm("password", e)}
             value={formMemo.password}
           />
-          <CustomBtn title="Log In" />
+          <CustomBtn title="Log In"  />
           <div className="text-center mt-4">
             <CustomLink
               title="Don't have an account?"

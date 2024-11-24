@@ -7,6 +7,7 @@ import { IResult, IData } from "./interface/data";
 import { setSelectedMovie } from "../../store/movieSlice";
 import { ip } from "../../util/helper";
 
+
 const Home = () => {
   const [data, setData] = useState<IResult[]>([]);
   const [page, setPage] = useState(1);
@@ -81,18 +82,13 @@ const Home = () => {
   const token = useSelector((state:any)=>state.auth.token)
   const addToFavorite = async (item: IResult) => {
     try {
-      console.log('token',token)
-      const res = await axios.post(
-        `${ip}/favorites/`, 
-        item, 
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-      
-      if (res.status === 200 || res.status === 201) {
+      const config = {
+        headers: { Authorization: `Bearer ${token}` }
+    };
+       
+      const res = await axios.post(`${ip}/favorites/`,item,config);
+      console.log('response is',res)
+      if (res.status === 201) {
         window.alert("Added to Favorites!");
       } else {
         window.alert("Error adding to Favorites!");
@@ -128,9 +124,9 @@ const Home = () => {
           view === "grid" ? "grid-cols-2 md:grid-cols-4" : "grid-cols-1"
         } gap-4`}
       >
-        {data.map((item) => (
+        {data.map((item,index) => (
           <div
-            key={item.trackId}
+            key={index}
             className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300"
           >
             <img
