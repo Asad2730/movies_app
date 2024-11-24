@@ -18,14 +18,16 @@ export const CustomInput = ({
   onChange,
 }: ICustomInput) => (
   <div>
-    <label className="block text-sm font-medium text-gray-600">{label}</label>
+    <label className="block text-sm font-medium text-gray-600 ">{label}</label>
     <input
       type={type}
       value={value}
       onChange={onChange}
       required={require}
-      className="w-full p-3 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
       placeholder={placeHolder}
+      className="w-full p-3 mt-2 border rounded-md focus:outline-none focus:ring-2
+       focus:ring-indigo-500 placeholder-gray-500
+        dark:placeholder-gray-400 text-gray-900 dark:text-black"
     />
   </div>
 );

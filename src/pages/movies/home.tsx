@@ -77,7 +77,9 @@ const Home = () => {
 
   const addToFavorite = async (item: IResult) => {
     try {
+      console.log('item->',item)
       const res = await axios.post(`${ip}/favorites/`, item);
+      console.log(res,'res is this')
       if (res.status === 200 || res.status === 201) {
         window.alert("Added to Favorites!");
       } else {
