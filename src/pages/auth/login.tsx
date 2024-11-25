@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { CustomInput } from "./components/customInput";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setAuthToken } from "../../store/authSlice";
+import { setAuthToken, setUser } from "../../store/authSlice";
 import { loginUser } from "./api/request";
 import { AuthForm } from "./components/authForm";
 
@@ -24,8 +24,10 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const token = await loginUser(form);
-      dispatch(setAuthToken(token));
+      const res = await loginUser(form);
+      console.log('user data',res)
+      dispatch(setUser(res.user))
+      dispatch(setAuthToken(res.token));
       navigate("/");
     } catch (error) {
       window.alert(`Error during login: ${error}`);

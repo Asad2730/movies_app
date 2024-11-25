@@ -7,8 +7,10 @@ import { setSelectedMovie } from "../../store/movieSlice";
 import { MoviesList } from "./components/moviesList";
 import {  GetFavorite } from "./api/request";
 import { HeaderNavigation } from "./components/headerNavigation";
+import { IUser } from "./interface/user";
 
 const Favorites = () => {
+  const user:IUser = useSelector((state: any) => state.auth.user);
   const token = useSelector((state: any) => state.auth.token);
   const [data, setData] = useState<IResult[]>([]);
   const [page, setPage] = useState(1);
@@ -20,15 +22,18 @@ const Favorites = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+   
   const loadMovies = useCallback(async () => {
     if (loading || !hasMore) return;
-
+  
     setLoading(true);
     setError(null);
     try {
-      const results = await GetFavorite(token, page);
-
+      const results = await GetFavorite(token, page, user._id);
+      if (!Array.isArray(results)) {
+        throw new Error("API response is not an array");
+      }
+  
       if (results.length === 0) {
         setHasMore(false);
       } else {
@@ -40,7 +45,9 @@ const Favorites = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, loading, hasMore, token]);
+  }, [page, loading, hasMore, token, user]);
+  
+ 
 
   useEffect(() => {
     loadMovies();

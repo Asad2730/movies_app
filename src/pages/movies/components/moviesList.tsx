@@ -1,11 +1,12 @@
 import { useSelector } from "react-redux";
 import { IResult } from "../interface/data";
 import { FaRegHeart } from "react-icons/fa";
+import { IUser } from "../interface/user";
 
 interface IMoviesList {
   data: IResult[];
   handleNavigate: (item: IResult) => void;
-  addToFavorite?: (item: IResult, token: string) => Promise<void>;
+  addToFavorite?: (item: IResult, token: string,userId:string) => Promise<void>;
   view: string;
 }
 
@@ -15,6 +16,7 @@ export const MoviesList = ({
   addToFavorite,
   view,
 }: IMoviesList) => {
+  const user:IUser = useSelector((state: any) => state.auth.user);
   const token = useSelector((state: any) => state.auth.token);
 
   return (
@@ -51,7 +53,7 @@ export const MoviesList = ({
 
             {token && addToFavorite && (
               <button
-                onClick={() => addToFavorite(item, token)}
+                onClick={() => addToFavorite(item, token,user._id)}
                 className="w-full md:w-auto text-red-500 text-2xl"
                 title="Add to Favorites"
               >

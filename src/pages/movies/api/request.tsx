@@ -21,12 +21,16 @@ export const fetchMovies = async (page: number): Promise<IData["results"]> => {
   }
 };
 
-export const addToFavorite = async (item: IResult, token: string) => {
+export const addToFavorite = async (item: IResult, token: string,userId:string) => {
   try {
     const config = {
       headers: { Authorization: `Bearer ${token}` },
     };
-    const res = await axios.post(`${ip}/favorites/`, item, config);
+
+    const body = {...item,userId}
+    console.log('body',body)
+    const res = await axios.post(`${ip}/favorites/`, body, config);
+    console.log('bocy',res)
     if (res.status === 201) {
       window.alert("Added to Favorites!");
     } else {
@@ -38,13 +42,13 @@ export const addToFavorite = async (item: IResult, token: string) => {
   }
 };
 
-export const GetFavorite = async (token: string, page: number) => {
+export const GetFavorite = async (token: string, page: number,id:string) => {
   try {
     const config = {
       headers: { Authorization: `Bearer ${token}` },
     };
-
-    const res = await axios.get(`${ip}/favorites?page=${page}`, config);
+    
+    const res = await axios.get(`${ip}/favorites?userId=${id}&page=${page}`, config);
 
     if (res.status === 200) {
       return res.data.favorites;
