@@ -1,1 +1,1 @@
-export const ip:string = 'http://localhost:8000/api'
+export const ip:string = 'https://warm-spire-24331-49c1611ec36d.herokuapp.com'
