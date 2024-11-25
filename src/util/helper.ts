@@ -1,1 +1,1 @@
-export const ip:string = 'https://warm-spire-24331-49c1611ec36d.herokuapp.com'
+export const ip:string = 'https://warm-spire-24331-49c1611ec36d.herokuapp.com/api'
